@@ -17,6 +17,16 @@ var app, imagesContainer, texture, displacementFilter;
 var imageList = [ "images/sample01.png", "images/sample02.png"];
 var textureImage = "images/crystalize.jpg"; // "images/smog.webp";
 
+// その他のフィルター
+var asciiFilter = new PIXI.filters.AsciiFilter();
+asciiFilter.size = 10
+var oldFilmFilter = new PIXI.filters.OldFilmFilter();
+var pixelateFilter = new PIXI.filters.PixelateFilter();
+var noiseFilter = new PIXI.filters.NoiseFilter();
+var godrayFilter = new PIXI.filters.GodrayFilter();
+var reflectionFilter = new PIXI.filters.ReflectionFilter();
+reflectionFilter.boundary = 0.6
+
 /**
  * 初期化
  */
@@ -38,9 +48,9 @@ function init () {
   imagesContainer = new PIXI.Container();
   app.stage.addChild(imagesContainer);
 
-  for (var i = 0; i < imageList.length; i++) {
-    var texture = new PIXI.Texture.from(imageList[i]);
-    var sprite = new PIXI.Sprite(texture);
+  for (let i = 0; i < imageList.length; i++) {
+    let texture = new PIXI.Texture.from(imageList[i]);
+    let sprite = new PIXI.Sprite(texture);
     sprite.anchor.set(.5);
     sprite.x = window.innerWidth / 2;
     sprite.y = window.innerHeight / 2;
@@ -71,10 +81,45 @@ function init () {
   displacementFilter.autoFit = true;
 
   // その他のフィルター
-  var asciiFilter = new PIXI.filters.AsciiFilter();
-  var oldFilmFilter = new PIXI.filters.OldFilmFilter();
-  var pixelateFilter = new PIXI.filters.PixelateFilter();
-  var noiseFilter = new PIXI.filters.NoiseFilter();
+  document.querySelectorAll('.btn').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var target = null;
+      if (this.classList.contains('js-ascii')) target = asciiFilter
+      if (this.classList.contains('js-old')) target = oldFilmFilter
+      if (this.classList.contains('js-mosaic')) target = pixelateFilter
+      if (this.classList.contains('js-noise')) target = noiseFilter
+      if (this.classList.contains('js-godray')) target = godrayFilter
+      if (this.classList.contains('js-reflection')) target = reflectionFilter
+
+      if (this.classList.contains('js-wacky')) {
+        isWacky = !isWacky
+        if (isWacky) {
+          this.classList.add('active')
+          texture.anchor.set(.5);
+          texture.x = window.innerWidth / 2;
+          texture.y = window.innerHeight / 2;
+        } else {
+          this.classList.remove('active')
+          texture.anchor.set(0, 0);
+          texture.rotation = 0;
+          texture.x = 0;
+          texture.y = 0;
+          texture.scale.x = 2;
+          texture.scale.y = 2;
+        }
+        return false;
+      }
+
+      var index = app.stage.filters.indexOf(target);
+      if (index == -1) {
+        this.classList.add('active')
+        app.stage.filters.push(target)
+      } else {
+        this.classList.remove('active')
+        app.stage.filters.splice(index, 1)
+      }
+    })
+  })
 
   // フィルターを追加
   app.stage.filters = [ displacementFilter ];
@@ -166,15 +211,17 @@ function resizeHandler () {
  * 描画
  */
 function render () {
-    displacementFilter.rotation += .001;
-    requestAnimationFrame(render);
-    app.renderer.render(app.stage);
+  reflectionFilter.time += 0.05
+  godrayFilter.time += 0.05
+  displacementFilter.rotation += .001;
+  requestAnimationFrame(render);
+  app.renderer.render(app.stage);
 }
 
 /**
  * 実行
  */
 init();
-window.addEventListener('click', clickHandler)
+document.querySelector('canvas').addEventListener('click', clickHandler)
 window.addEventListener('resize', resizeHandler)
 render();
