@@ -8,4 +8,4 @@
 - https://github.com/pixijs/pixi-filte
 
 ## DEMO
-- https://yuki-sakaguchi.github.io/-Pixi-filter-slider/index.html
+- https://yuki-sakaguchi.github.io/Pixi-filter-slider/index.html
