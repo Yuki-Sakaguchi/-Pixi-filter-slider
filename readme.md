@@ -6,3 +6,6 @@
 ## PIXIのFilter
 - https://pixijs.io/pixi-filters/tools/demo/
 - https://github.com/pixijs/pixi-filte
+
+## DEMO
+- https://yuki-sakaguchi.github.io/-Pixi-filter-slider/index.html
