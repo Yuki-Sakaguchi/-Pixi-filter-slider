@@ -10,12 +10,13 @@
  *    https://github.com/pixijs/pixi-filters
  */
 var currentIndex = 0;
+var currentTexture = 0;
 var isAnimation = false;
 var isWacky = false; // trueにすると奇抜なアニメーションになる
 
 var app, imagesContainer, texture, displacementFilter;
 var imageList = [ "images/sample01.png", "images/sample02.png"];
-var textureImage = "images/crystalize.jpg"; // "images/smog.webp";
+var textureImage = [ "images/texture00.jpg", "images/texture01.webp", "images/texture02.jpg", "images/texture03.jpg", "images/texture04.jpg", "images/texture05.jpg", "images/texture06.jpg", "images/texture07.jpg", "images/texture08.jpg", "images/texture09.jpg", ];
 
 // その他のフィルター
 var asciiFilter = new PIXI.filters.AsciiFilter();
@@ -40,7 +41,6 @@ function init () {
   // フルスクリーンになるように設定
   app.renderer.view.style.position = "absolute";
   app.renderer.view.style.display = "block";
-  app.renderer.autoResize = true;
   app.renderer.resize(window.innerWidth, window.innerHeight);
   document.body.appendChild(app.view);
 
@@ -63,34 +63,14 @@ function init () {
     imagesContainer.addChild(sprite);
   }
 
-  // アニメーションで使うテクスチャーを読み込む
-  texture = new PIXI.Sprite.from(textureImage);
-  texture.texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT
-  texture.scale.x = 2;
-  texture.scale.y = 2;
-  if (isWacky) {
-    texture.anchor.set(.5);
-    texture.x = window.innerWidth / 2;
-    texture.y = window.innerHeight / 2;
-  }
-
-  // テクスチャーをフィルターに変換
-  displacementFilter = new PIXI.filters.DisplacementFilter(texture);
-  displacementFilter.scale.x = 0;
-  displacementFilter.scale.y = 0;
-  displacementFilter.autoFit = true;
+  // テクスチャの設定
+  setTexture(textureImage[currentTexture])
+  document.querySelector('.js-texture').textContent = "CHANGE TEXTURE (" + (currentTexture+1) + "/" + textureImage.length + ")" 
 
   // その他のフィルター
   document.querySelectorAll('.btn').forEach(function (el) {
     el.addEventListener('click', function () {
-      var target = null;
-      if (this.classList.contains('js-ascii')) target = asciiFilter
-      if (this.classList.contains('js-old')) target = oldFilmFilter
-      if (this.classList.contains('js-mosaic')) target = pixelateFilter
-      if (this.classList.contains('js-noise')) target = noiseFilter
-      if (this.classList.contains('js-godray')) target = godrayFilter
-      if (this.classList.contains('js-reflection')) target = reflectionFilter
-
+      // アニメーションを奇抜にするボタンの場合
       if (this.classList.contains('js-wacky')) {
         isWacky = !isWacky
         if (isWacky) {
@@ -110,6 +90,31 @@ function init () {
         return false;
       }
 
+      // テクスチャを入れ替える場合
+      if (this.classList.contains('js-texture')) {
+        var index = app.stage.filters.indexOf(displacementFilter);
+        currentTexture++
+        if (currentTexture == textureImage.length) {
+          currentTexture = 0;
+        }
+        this.textContent = "CHANGE TEXTURE (" + (currentTexture+1) + "/" + textureImage.length + ")" 
+        setTexture(textureImage[currentTexture])
+        app.stage.filters.splice(index, 1)
+        app.stage.filters.push(displacementFilter)
+        app.stage.removeChild(texture);
+        app.stage.addChild(texture);
+        return false;
+      }
+
+      // 単純に追加する場合、対象のエフェクトを決める
+      var target = null;
+      if (this.classList.contains('js-ascii')) target = asciiFilter
+      if (this.classList.contains('js-old')) target = oldFilmFilter
+      if (this.classList.contains('js-mosaic')) target = pixelateFilter
+      if (this.classList.contains('js-noise')) target = noiseFilter
+      if (this.classList.contains('js-godray')) target = godrayFilter
+      if (this.classList.contains('js-reflection')) target = reflectionFilter
+      
       var index = app.stage.filters.indexOf(target);
       if (index == -1) {
         this.classList.add('active')
@@ -124,6 +129,29 @@ function init () {
   // フィルターを追加
   app.stage.filters = [ displacementFilter ];
   app.stage.addChild(texture);
+}
+
+/**
+ * アニメーションで使うテクスチャーを設定する
+ * @param {string} image 
+ */
+function setTexture (image) {
+  // アニメーションで使うテクスチャーを読み込む
+  texture = new PIXI.Sprite.from(image);
+  texture.texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT
+  texture.scale.x = 2;
+  texture.scale.y = 2;
+  if (isWacky) {
+    texture.anchor.set(.5);
+    texture.x = window.innerWidth / 2;
+    texture.y = window.innerHeight / 2;
+  }
+
+  // テクスチャーをフィルターに変換
+  displacementFilter = new PIXI.filters.DisplacementFilter(texture);
+  displacementFilter.scale.x = 0;
+  displacementFilter.scale.y = 0;
+  displacementFilter.autoFit = true;
 }
 
 /**
