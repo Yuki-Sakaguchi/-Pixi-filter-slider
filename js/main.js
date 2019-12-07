@@ -14,8 +14,8 @@ var isAnimation = false;
 var isWacky = false; // trueにすると奇抜なアニメーションになる
 
 var app, imagesContainer, texture, displacementFilter;
-var imageList = [ "../images/sample01.png", "../images/sample02.png"];
-var textureImage = "../images/crystalize.jpg"; // "../images/smog.webp";
+var imageList = [ "images/sample01.png", "images/sample02.png"];
+var textureImage = "images/crystalize.jpg"; // "images/smog.webp";
 
 /**
  * 初期化
