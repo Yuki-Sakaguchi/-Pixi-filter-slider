@@ -193,8 +193,8 @@ function moveSlide (index) {
       ease: "easeInCirc",
       onComplete: function () {
         slideAnime.fromTo(displacementFilter.scale, .5, {
-            x: - 200,
-            y: - 0,
+            x: 200,
+            y: 0,
           }, {
               x: 0,
               y: 0,
